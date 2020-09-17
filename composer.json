@@ -68,6 +68,7 @@
         "psr/http-factory": "1.0.1",
         "psr/http-message": "1.0.1",
         "psr/log": "1.1.2",
+        "sabberworm/php-css-parser": "8.3.0",
         "scssphp/scssphp": "1.0.6",
         "sensio/framework-extra-bundle": "5.5.3",
         "sroze/messenger-enqueue-transport": "0.4.0",

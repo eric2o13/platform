@@ -4,6 +4,8 @@ namespace Shopware\Storefront\Theme;
 
 use League\Flysystem\FilesystemInterface;
 use Padaliyajay\PHPAutoprefixer\Autoprefixer;
+use Sabberworm\CSS\OutputFormat;
+use Sabberworm\CSS\Parser;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\Formatter\Crunched;
 use ScssPhp\ScssPhp\Formatter\Expanded;
@@ -214,8 +216,20 @@ class ThemeCompiler implements ThemeCompilerInterface
             );
         }
         $autoPreFixer = new Autoprefixer($cssOutput);
+        $cssOutput = $autoPreFixer->compile();
 
-        return $autoPreFixer->compile();
+        /*
+         * As there is currently no response from the maintainer of the autoprefixer
+         * and there is no way to minify the CSS output from the autoprefixer, see:
+         * https://github.com/padaliyajay/php-autoprefixer/issues/10
+         *
+         * This is implemented as a workaround. This might be removed if a new version
+         * of the autoprefixer is released and the linked issue is resolved, to remove
+         * the overhead from this workaround
+         */
+        $cssParser = new Parser($cssOutput);
+
+        return $cssParser->parse()->render(OutputFormat::createCompact());
     }
 
     private function formatVariables(array $variables): array
