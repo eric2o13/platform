@@ -7,6 +7,8 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Framework\Rule\Exception\UnsupportedOperatorException;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
+use Shopware\Core\System\CustomField\CustomFieldTypes;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -54,7 +56,7 @@ class LineItemCustomFieldRule extends Rule
             'renderedField' => [new NotBlank()],
             'selectedField' => [new NotBlank()],
             'selectedFieldSet' => [new NotBlank()],
-            'renderedFieldValue' => [new NotBlank()],
+            'renderedFieldValue' => $this->getRenderedFieldValueConstraints(),
             'operator' => [
                 new NotBlank(),
                 new Choice(
@@ -108,5 +110,26 @@ class LineItemCustomFieldRule extends Rule
             default:
                 throw new UnsupportedOperatorException($this->operator, self::class);
         }
+    }
+
+    /**
+     * @return Constraint[]
+     */
+    private function getRenderedFieldValueConstraints(): array
+    {
+        $constraints = [];
+
+        if(!\is_array($this->renderedField) || !\array_key_exists('type', $this->renderedField)) {
+            return [new NotBlank()];
+        }
+
+        switch($this->renderedField['type']) {
+            case CustomFieldTypes::BOOL:
+                break;
+            default:
+                $constraints[] = new NotBlank();
+        }
+
+        return $constraints;
     }
 }
